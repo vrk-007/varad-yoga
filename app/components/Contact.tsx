@@ -5,13 +5,12 @@ export default function Contact() {
                 Contact us
             </h2>
             <address className="text-center mt-10 non-italic space-y-4">
-                <p>📞 <strong>Phone: </strong> +91 9307005459</p>
+                <p>📞 <strong>Phone: </strong> +91 93shshhshs</p>
 
-                <p>📧 <strong>Email:</strong> varadvrk007@gmail.com</p>
+                <p>📧 <strong>Email:</strong> sahsasa0.com</p>
 
                 <p>
-                    📍 <strong>Location:</strong>Marva apt, Ulkanagari,Garkheda parisar,Chhatrapati Sambhajinagar,
-                    Maharashtra
+                    📍 <strong>Location:</strong>Msgsas ap as
                 </p>
 
                 <p>
