@@ -6,24 +6,50 @@ export default function Contact() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
+    const [success, setSuccess] = useState(false);
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const response = await fetch("/api/contact", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                name,
-                email,
-                message,
-            }),
-        });
+        setLoading(true);
 
-        const data = await response.json();
+        try {
+            const response = await fetch("/api/contact", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name,
+                    email,
+                    message,
+                }),
+            });
 
-        console.log(data);
+            const data = await response.json();
+            console.log("Backend responded");
+
+            if (response.ok) {
+                setSuccess(true);
+                setName("");
+                setEmail("");
+                setMessage("");
+            }
+            else {
+                setError(data.message);
+            }
+            console.log(data);
+            console.log("success:", success);
+        } catch (error) {
+            console.error(error);
+            setError("Something went wrong ! Please try again");
+        }
+        finally {
+            setLoading(false);
+        }
+
     };
+
 
     return (
 
@@ -57,7 +83,13 @@ export default function Contact() {
                     type="text"
                     placeholder="Your Name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                        setName(e.target.value);
+                        setSuccess(false);
+                        setError("");
+                    }
+                    }
+
                     className="border rounded-lg p-3"
                 />
 
@@ -65,26 +97,43 @@ export default function Contact() {
                     type="email"
                     placeholder="Your Email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                        setEmail(e.target.value);
+                        setSuccess(false);
+                        setError("");
+                    }
+                    }
                     className="border rounded-lg p-3"
                 />
 
                 <textarea
                     placeholder="Your Message"
                     value={message}
-                    onChange={(e) => setMessage(e.target.value)}
+                    onChange={(e) => {
+                        setMessage(e.target.value);
+                        setSuccess(false);
+                        setError("");
+                    }
+                    }
                     rows={5}
                     className="border rounded-lg p-3"
                 ></textarea>
 
-                <button
+                < button
                     type="submit"
+                    disabled={loading}
                     className="bg-amber-300 text-white rounded-lg py-3"
                 >
-                    Send Message
+                    {loading ? " Sending..." : success ? "✅ Message sent" : "Send message"}
                 </button>
 
+
             </form>
+            {error && (
+                <p className="mt-4 text-red-500 font-medium">
+                    {error}
+                </p>
+            )}
         </section>
     );
 }
