@@ -1,14 +1,43 @@
 import { Resend } from "resend"
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(request: Request) {
-    const body = await request.json();
+   try{
+     const body = await request.json();
     //const { name, email, message } = body;
     const name = String(body.name).trim();
     const email = String(body.email).trim();
     const message = String(body.message).trim();
+    if (name.length > 100) {
+        return Response.json(
+            {
+                success: false,
+                message: "Name is too long.",
+            },
+            { status: 400 }
+        );
+    }
+    if (email.length > 254) {
+        return Response.json(
+            {
+                success: false,
+                message: "Email is too long.",
+            },
+            { status: 400 }
+        );
+    }
+    if (message.length > 2000) {
+        return Response.json(
+            {
+                success: false,
+                message: "Message is too long.",
+            },
+            { status: 400 }
+        );
+    }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!name) {
         return Response.json(
@@ -100,12 +129,39 @@ export async function POST(request: Request) {
         success: true,
         message: "Email Sent Sucessfully!"
     });
+} catch(error){
+    console.error("Contact API error:",error);
+
+    return Response.json(
+        {
+            sucess:false,
+            message : "Something went wrong, please try again",
+        },
+        {status:500}
+    );
 }
+}
+
 
 
 
 export async function GET() {
     try {
+        const session = await auth();
+
+        if (!session?.user) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
+
+        if (session.user.role !== "admin") {
+            return NextResponse.json(
+                { error: "Forbidden" },
+                { status: 403 }
+            );
+        }
         const contacts = await prisma.contact.findMany({
             orderBy: {
                 createdAt: "desc",
